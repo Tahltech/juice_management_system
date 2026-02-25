@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  juice_app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: juice_app_prod
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./storage:/var/www/storage
+      - ./bootstrap/cache:/var/www/bootstrap/cache
+    networks:
+      - juice_network
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=${APP_URL:-http://localhost}
+      - DB_CONNECTION=mysql
+      - DB_HOST=juice_db
+      - DB_PORT=3306
+      - DB_DATABASE=${DB_DATABASE:-juice_management}
+      - DB_USERNAME=${DB_USERNAME:-juice_user}
+      - DB_PASSWORD=${DB_PASSWORD:-juice_password}
+      - CACHE_DRIVER=redis
+      - REDIS_HOST=juice_redis
+      - REDIS_PORT=6379
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_ENCRYPTION=tls
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME:-FreshSip}
+    ports:
+      - "8080:80"
+    depends_on:
+      - juice_db
+      - juice_redis
+
+  juice_db:
+    image: mysql:8.0
+    container_name: juice_db_prod
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-juice_management}
+      MYSQL_USER: ${DB_USERNAME:-juice_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-juice_password}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - juice_network
+    ports:
+      - "3306:3306"
+
+  juice_redis:
+    image: redis:7-alpine
+    container_name: juice_redis_prod
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - juice_network
+    ports:
+      - "6379:6379"
+
+  juice_nginx:
+    image: nginx:alpine
+    container_name: juice_nginx_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/conf.d/default.conf
+      - ./public:/var/www/public
+    networks:
+      - juice_network
+    depends_on:
+      - juice_app
+    command: >
+      sh -c "envsubst '${APP_URL}' < /etc/nginx/conf.d/default.conf > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  juice_network:
+    driver: bridge

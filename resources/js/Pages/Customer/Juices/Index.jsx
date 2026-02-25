@@ -3,6 +3,13 @@ import CustomerLayout from '@/Layouts/CustomerLayout';
 import { Head, Link } from '@inertiajs/react';
 import axios from 'axios';
 
+const formatCurrency = (value) => {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'XOF'
+        }).format(value);
+    };
+
 export default function JuiceIndex() {
     const [juices, setJuices] = useState({ data: [], links: [] });
     const [filters, setFilters] = useState({ search: '', sort: 'latest' });
@@ -48,6 +55,20 @@ export default function JuiceIndex() {
             fetchJuices(searchTerm, sortBy);
         }
     }, [sortBy]);
+
+    const handleQuickAdd = async (juiceId) => {
+        try {
+            await axios.post('/customer/cart/add', {
+                juice_id: juiceId,
+                quantity: 1
+            });
+            // Show success message
+            alert('Item added to cart!');
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            alert('Failed to add item to cart. Please try again.');
+        }
+    };
 
     return (
         <CustomerLayout>
@@ -147,7 +168,7 @@ export default function JuiceIndex() {
                                     <h3 className="text-lg font-semibold text-gray-900 mb-2">{juice.name}</h3>
                                     <p className="text-gray-600 text-sm mb-3 line-clamp-2">{juice.description}</p>
                                     <div className="flex items-center justify-between mb-3">
-                                        <span className="text-2xl font-bold text-green-600">${parseFloat(juice.price).toFixed(2)}</span>
+                                        <span className="text-2xl font-bold text-green-600">{formatCurrency(juice.price)}</span>
                                         <span className={`text-sm ${
                                             juice.stock_quantity <= 10 ? 'text-red-600 font-medium' : 'text-gray-500'
                                         }`}>
@@ -161,7 +182,10 @@ export default function JuiceIndex() {
                                         >
                                             View Details
                                         </Link>
-                                        <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded transition-colors duration-200">
+                                        <button 
+                                            onClick={() => handleQuickAdd(juice.id)}
+                                            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded transition-colors duration-200"
+                                        >
                                             Quick Add
                                         </button>
                                     </div>

@@ -1,8 +1,17 @@
 import React from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head } from '@inertiajs/react';
+import SalesChart from '@/Components/SalesChart';
+import TopJuicesChart from '@/Components/TopJuicesChart';
 
-export default function Dashboard({ stats, recentOrders, lowStockJuices }) {
+const formatCurrency = (value) => {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'XOF'
+        }).format(value);
+    };
+
+export default function Dashboard({ stats, recentOrders, lowStockJuices, salesData, monthlySalesData, topJuices }) {
     return (
         <AdminLayout>
             <Head title="Admin Dashboard" />
@@ -26,7 +35,7 @@ export default function Dashboard({ stats, recentOrders, lowStockJuices }) {
                                     <div className="ml-5 w-0 flex-1">
                                         <dl>
                                             <dt className="text-sm font-medium text-gray-500 truncate">Total Sales</dt>
-                                            <dd className="text-lg font-medium text-gray-900">${parseFloat(stats.total_sales).toFixed(2)}</dd>
+                                            <dd className="text-lg font-medium text-gray-900">{formatCurrency(stats.total_sales || 0)}</dd>
                                         </dl>
                                     </div>
                                 </div>
@@ -94,7 +103,51 @@ export default function Dashboard({ stats, recentOrders, lowStockJuices }) {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Charts Section */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <SalesChart 
+                            data={monthlySalesData} 
+                            title="Monthly Sales (Last 12 Months)" 
+                            type="bar" 
+                            color="#3b82f6" 
+                        />
+                        <SalesChart 
+                            data={salesData} 
+                            title="Daily Sales (Last 30 Days)" 
+                            type="line" 
+                            color="#10b981" 
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <TopJuicesChart data={topJuices} />
+                        <div className="bg-white p-6 rounded-lg shadow">
+                            <h3 className="text-lg font-medium text-gray-900 mb-4">Sales Summary</h3>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                                    <span className="text-sm font-medium text-green-800">Total Revenue</span>
+                                    <span className="text-lg font-bold text-green-900">
+                                        ${parseFloat(stats.total_sales).toFixed(2)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                                    <span className="text-sm font-medium text-blue-800">Total Orders</span>
+                                    <span className="text-lg font-bold text-blue-900">
+                                        {stats.total_orders}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                                    <span className="text-sm font-medium text-purple-800">Average Order Value</span>
+                                    <span className="text-lg font-bold text-purple-900">
+                                        {formatCurrency(stats.total_orders > 0 ? parseFloat(stats.total_sales) / stats.total_orders : 0)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Recent Orders and Low Stock */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Recent Orders */}
                         <div className="bg-white shadow rounded-lg">
                             <div className="px-4 py-5 sm:p-6">

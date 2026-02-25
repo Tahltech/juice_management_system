@@ -3,6 +3,16 @@ import CustomerLayout from '@/Layouts/CustomerLayout';
 import { Head, Link } from '@inertiajs/react';
 
 export default function Dashboard({ stats, recentOrders }) {
+    // Defensive programming for data
+    const safeRecentOrders = Array.isArray(recentOrders) ? recentOrders : [];
+    const safeStats = stats || {};
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'XOF'
+        }).format(value);
+    };
+
     return (
         <CustomerLayout>
             <Head title="My Dashboard" />
@@ -48,7 +58,7 @@ export default function Dashboard({ stats, recentOrders }) {
                                     <div className="ml-5 w-0 flex-1">
                                         <dl>
                                             <dt className="text-sm font-medium text-gray-500 truncate">Total Orders</dt>
-                                            <dd className="text-lg font-medium text-gray-900">{stats.total_orders}</dd>
+                                            <dd className="text-lg font-medium text-gray-900">{safeStats.total_orders || 0}</dd>
                                         </dl>
                                     </div>
                                 </div>
@@ -68,7 +78,7 @@ export default function Dashboard({ stats, recentOrders }) {
                                     <div className="ml-5 w-0 flex-1">
                                         <dl>
                                             <dt className="text-sm font-medium text-gray-500 truncate">Active Orders</dt>
-                                            <dd className="text-lg font-medium text-gray-900">{stats.active_orders}</dd>
+                                            <dd className="text-lg font-medium text-gray-900">{safeStats.active_orders || 0}</dd>
                                         </dl>
                                     </div>
                                 </div>
@@ -88,7 +98,7 @@ export default function Dashboard({ stats, recentOrders }) {
                                     <div className="ml-5 w-0 flex-1">
                                         <dl>
                                             <dt className="text-sm font-medium text-gray-500 truncate">Delivered Orders</dt>
-                                            <dd className="text-lg font-medium text-gray-900">{stats.delivered_orders}</dd>
+                                            <dd className="text-lg font-medium text-gray-900">{safeStats.delivered_orders || 0}</dd>
                                         </dl>
                                     </div>
                                 </div>
@@ -108,7 +118,7 @@ export default function Dashboard({ stats, recentOrders }) {
                                     <div className="ml-5 w-0 flex-1">
                                         <dl>
                                             <dt className="text-sm font-medium text-gray-500 truncate">Total Spent</dt>
-                                            <dd className="text-lg font-medium text-gray-900">${parseFloat(stats.total_spent).toFixed(2)}</dd>
+                                            <dd className="text-lg font-medium text-gray-900">{formatCurrency(safeStats.total_spent || 0)}</dd>
                                         </dl>
                                     </div>
                                 </div>
@@ -129,9 +139,9 @@ export default function Dashboard({ stats, recentOrders }) {
                                 </Link>
                             </div>
                             <div className="flow-root">
-                                {recentOrders.length > 0 ? (
+                                {safeRecentOrders.length > 0 ? (
                                     <ul className="-my-5 divide-y divide-gray-200">
-                                        {recentOrders.map((order) => (
+                                        {safeRecentOrders.map((order) => (
                                             <li key={order.id} className="py-4">
                                                 <div className="flex items-center justify-between">
                                                     <div>
@@ -139,13 +149,13 @@ export default function Dashboard({ stats, recentOrders }) {
                                                             Order #{order.id}
                                                         </p>
                                                         <p className="text-sm text-gray-500">
-                                                            {new Date(order.created_at).toLocaleDateString()} • 
-                                                            {order.orderItems.length} items
+                                                            {order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A'} • 
+                                                            {order.orderItems?.length || 0} items
                                                         </p>
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-sm font-medium text-gray-900">
-                                                            ${parseFloat(order.total_amount).toFixed(2)}
+                                                            {formatCurrency(order.total_amount || 0)}
                                                         </p>
                                                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                                                             order.status === 'delivered' ? 'bg-green-100 text-green-800' :
@@ -161,20 +171,18 @@ export default function Dashboard({ stats, recentOrders }) {
                                         ))}
                                     </ul>
                                 ) : (
-                                    <div className="text-center py-8">
+                                    <div className="text-center py-12">
                                         <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
                                         <h3 className="mt-2 text-sm font-medium text-gray-900">No orders yet</h3>
-                                        <p className="mt-1 text-sm text-gray-500">
-                                            Get started by browsing our delicious juices.
-                                        </p>
+                                        <p className="mt-1 text-sm text-gray-500">Get started by placing your first order.</p>
                                         <div className="mt-6">
                                             <Link
-                                                href="/juices"
-                                                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                                                href="/customer/juices"
+                                                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                                             >
-                                                Shop Now
+                                                Browse Juices
                                             </Link>
                                         </div>
                                     </div>

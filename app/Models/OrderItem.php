@@ -34,11 +34,11 @@ class OrderItem extends Model
 
     public function getFormattedPriceAttribute()
     {
-        return '$' . number_format($this->price, 2);
+        return number_format($this->price, 2) . ' XOF';
     }
 
     public function getFormattedSubtotalAttribute()
     {
-        return '$' . number_format($this->subtotal, 2);
+        return number_format($this->subtotal, 2) . ' XOF';
     }
 }

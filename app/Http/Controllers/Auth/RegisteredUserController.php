@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\EmailService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,6 +45,14 @@ class RegisteredUserController extends Controller
 
         // Assign customer role to newly registered user
         $user->assignRole('customer');
+
+        // Send welcome email
+        try {
+            $emailService = new EmailService();
+            $emailService->sendWelcomeEmail($user->email, $user->name);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send welcome email: ' . $e->getMessage());
+        }
 
         event(new Registered($user));
 

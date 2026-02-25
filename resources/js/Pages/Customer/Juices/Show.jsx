@@ -1,13 +1,29 @@
 import React, { useState } from 'react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { Head, Link } from '@inertiajs/react';
+import axios from 'axios';
+
+const formatCurrency = (value) => {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'XOF'
+        }).format(value);
+    };
 
 export default function JuiceShow({ juice, relatedJuices }) {
     const [quantity, setQuantity] = useState(1);
 
-    const handleAddToCart = () => {
-        // TODO: Implement actual cart functionality
-        alert(`Added ${quantity} ${juice.name}(s) to cart!`);
+    const handleAddToCart = async () => {
+        try {
+            await axios.post('/customer/cart/add', {
+                juice_id: juice.id,
+                quantity: quantity
+            });
+            alert(`${quantity} ${juice.name}(s) added to cart!`);
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            alert('Failed to add item to cart. Please try again.');
+        }
     };
 
     return (
@@ -58,7 +74,7 @@ export default function JuiceShow({ juice, relatedJuices }) {
                                 
                                 <div className="mb-6">
                                     <span className="text-3xl font-bold text-green-600">
-                                        ${parseFloat(juice.price).toFixed(2)}
+                                        {formatCurrency(juice.price)}
                                     </span>
                                 </div>
 

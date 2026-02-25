@@ -17,8 +17,9 @@ class PasswordResetLinkController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/ForgotPassword', [
+        return Inertia::render('Auth/CustomForgotPassword', [
             'status' => session('status'),
+            'success' => session('success'),
         ]);
     }
 
@@ -41,7 +42,7 @@ class PasswordResetLinkController extends Controller
         );
 
         if ($status == Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
+            return back()->with('success', 'Password reset link sent successfully! Please check your email inbox.');
         }
 
         throw ValidationException::withMessages([

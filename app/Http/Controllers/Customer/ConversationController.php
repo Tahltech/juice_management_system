@@ -58,7 +58,9 @@ class ConversationController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
-        $conversation->load(['messages.sender']);
+        $conversation->load(['messages' => function ($query) {
+            $query->orderBy('created_at', 'asc');
+        }, 'messages.sender']);
 
         return Inertia::render('Customer/Conversations/Show', [
             'conversation' => $conversation,
@@ -89,5 +91,60 @@ class ConversationController extends Controller
         $conversation->update(['last_message_at' => now()]);
 
         return redirect()->back();
+    }
+
+    public function latestMessages(Conversation $conversation)
+    {
+        // Check if this conversation belongs to the current user
+        if ($conversation->user_id !== request()->user()->id) {
+            abort(403);
+        }
+
+        $lastMessageId = request('last_message_id', 0);
+        
+        $messages = $conversation->messages()
+            ->with('sender')
+            ->where('id', '>', $lastMessageId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json($messages);
+    }
+
+    public function clearChat(Conversation $conversation): \Illuminate\Http\RedirectResponse
+    {
+        // Check if this conversation belongs to the current user
+        if ($conversation->user_id !== request()->user()->id) {
+            abort(403);
+        }
+
+        // Delete all messages in this conversation
+        $conversation->messages()->delete();
+        
+        // Update conversation timestamp
+        $conversation->update(['last_message_at' => now()]);
+
+        return redirect()->back()->with('success', 'Chat cleared successfully');
+    }
+
+    public function deleteMessage(Conversation $conversation, Message $message): \Illuminate\Http\JsonResponse
+    {
+        // Check if this conversation belongs to the current user
+        if ($conversation->user_id !== request()->user()->id) {
+            abort(403);
+        }
+
+        // Verify message belongs to this conversation
+        if ($message->conversation_id !== $conversation->id) {
+            return response()->json(['error' => 'Message not found in this conversation'], 404);
+        }
+
+        // Delete the message
+        $message->delete();
+
+        // Update conversation timestamp
+        $conversation->update(['last_message_at' => now()]);
+
+        return response()->json(['success' => true, 'message' => 'Message deleted successfully']);
     }
 }

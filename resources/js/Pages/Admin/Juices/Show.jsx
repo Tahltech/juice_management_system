@@ -2,6 +2,13 @@ import React from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link } from '@inertiajs/react';
 
+const formatCurrency = (value) => {
+        return new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'XOF'
+        }).format(value);
+    };
+
 export default function JuiceShow({ juice }) {
     return (
         <AdminLayout>

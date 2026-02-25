@@ -1,0 +1,116 @@
+/* FreshSip Brand Colors & Theme Variables */
+
+:root {
+    /* Brand Colors */
+    --fresh-orange: #FF6B35;
+    --fresh-green: #10B981;
+    --fresh-blue: #60A5FA;
+    --fresh-yellow: #FCD34D;
+    --fresh-dark: #047857;
+    --fresh-light: #FEF3C7;
+    
+    /* Light Theme Colors */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-tertiary: #6b7280;
+    --border-primary: #e5e7eb;
+    --border-secondary: #d1d5db;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    /* Dark Theme Colors */
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --bg-tertiary: #374151;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-tertiary: #9ca3af;
+    --border-primary: #374151;
+    --border-secondary: #4b5563;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+/* Theme-aware utilities */
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-tertiary { background-color: var(--bg-tertiary); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+
+.border-primary { border-color: var(--border-primary); }
+.border-secondary { border-color: var(--border-secondary); }
+
+/* Brand color utilities */
+.bg-fresh-orange { background-color: var(--fresh-orange); }
+.bg-fresh-green { background-color: var(--fresh-green); }
+.bg-fresh-blue { background-color: var(--fresh-blue); }
+.bg-fresh-yellow { background-color: var(--fresh-yellow); }
+.bg-fresh-dark { background-color: var(--fresh-dark); }
+.bg-fresh-light { background-color: var(--fresh-light); }
+
+.text-fresh-orange { color: var(--fresh-orange); }
+.text-fresh-green { color: var(--fresh-green); }
+.text-fresh-blue { color: var(--fresh-blue); }
+.text-fresh-yellow { color: var(--fresh-yellow); }
+.text-fresh-dark { color: var(--fresh-dark); }
+.text-fresh-light { color: var(--fresh-light); }
+
+/* Theme transition */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-lg);
+}
+
+.theme-toggle svg {
+    width: 24px;
+    height: 24px;
+    color: var(--text-primary);
+}
+
+/* Hide default theme toggle on small screens */
+@media (max-width: 640px) {
+    .theme-toggle {
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .theme-toggle svg {
+        width: 20px;
+        height: 20px;
+    }
+}

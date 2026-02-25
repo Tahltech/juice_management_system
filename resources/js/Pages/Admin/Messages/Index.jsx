@@ -1,8 +1,15 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import { useToast } from '@/Components/ToastProvider';
 
 export default function MessagesIndex({ messages }) {
+    const toast = useToast();
+    
+    // Ensure messages data exists
+    const messagesData = messages?.data || [];
+    const messageLinks = messages?.links || [];
+
     return (
         <AdminLayout>
             <Head title="Messages" />
@@ -16,11 +23,11 @@ export default function MessagesIndex({ messages }) {
                                     Customer Messages
                                 </h3>
                                 <div className="text-sm text-gray-600">
-                                    {messages.data.length} message{messages.data.length !== 1 ? 's' : ''}
+                                    {messagesData.length} message{messagesData.length !== 1 ? 's' : ''}
                                 </div>
                             </div>
 
-                            {messages.data.length === 0 ? (
+                            {messagesData.length === 0 ? (
                                 <div className="text-center py-12">
                                     <div className="text-gray-500">
                                         No messages received yet.
@@ -28,7 +35,7 @@ export default function MessagesIndex({ messages }) {
                                 </div>
                             ) : (
                                 <div className="space-y-4">
-                                    {messages.data.map((message) => (
+                                    {messagesData.map((message) => (
                                         <div
                                             key={message.id}
                                             className={`border rounded-lg p-4 ${
@@ -46,17 +53,17 @@ export default function MessagesIndex({ messages }) {
                                                             </span>
                                                         )}
                                                         <h4 className="text-lg font-medium text-gray-900">
-                                                            {message.subject}
+                                                            {message.subject || 'No Subject'}
                                                         </h4>
                                                     </div>
                                                     <p className="text-gray-600 mb-2">
-                                                        From: {message.user.name} ({message.user.email})
+                                                        From: {message.user?.name || 'Unknown'} ({message.user?.email || 'No email'})
                                                     </p>
                                                     <p className="text-gray-700 whitespace-pre-wrap">
-                                                        {message.message}
+                                                        {message.content || message.message || 'No message content'}
                                                     </p>
                                                     <div className="mt-3 text-sm text-gray-500">
-                                                        {new Date(message.created_at).toLocaleString()}
+                                                        {message.created_at ? new Date(message.created_at).toLocaleString() : 'No date'}
                                                     </div>
                                                 </div>
                                             </div>
@@ -65,10 +72,10 @@ export default function MessagesIndex({ messages }) {
                                 </div>
                             )}
 
-                            {messages.data.length > 0 && (
+                            {messagesData.length > 0 && (
                                 <div className="mt-6">
                                     <p className="text-sm text-gray-600">
-                                        Showing {messages.from} to {messages.last} of {messages.total} messages
+                                        Showing {messages.from || 1} to {messages.to || messagesData.length} of {messages.total || messagesData.length} messages
                                     </p>
                                 </div>
                             )}

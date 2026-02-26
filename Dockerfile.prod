@@ -1,7 +1,7 @@
-FROM php:8.2-fpm
+FROM php:8.2-fpm-alpine
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     git \
     zip \
     unzip \
@@ -9,13 +9,17 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libpng-dev \
     libonig-dev \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libmcrypt-dev \
-    libreadline-dev \
-    libxslt1-dev \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    readline-dev \
+    libxslt-dev \
+    curl-dev \
     supervisor \
-    nginx
+    nginx \
+    pkgconfig \
+    autoconf \
+    g++ \
+    make
 
 # Clear package cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

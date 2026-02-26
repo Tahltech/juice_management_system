@@ -5,7 +5,7 @@
 
 set -e
 
-echo "🚀 Starting FreshSip Production Deployment..."
+echo " Starting FreshSip Production Deployment..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -36,7 +36,7 @@ fi
 
 # Stop existing containers
 print_status "Stopping existing containers..."
-docker compose -f docker-compose.prod.yml down
+docker-compose down
 
 # Build frontend assets
 print_status "Building frontend assets..."
@@ -44,7 +44,7 @@ npm run build
 
 # Build and start production containers
 print_status "Building production containers..."
-docker compose -f docker-compose.prod.yml up -d --build
+docker-compose -f docker-compose.prod.yml up -d --build
 
 # Wait for containers to be ready
 print_status "Waiting for containers to be ready..."
@@ -52,34 +52,34 @@ sleep 30
 
 # Run Laravel optimizations
 print_status "Running Laravel optimizations..."
-docker compose -f docker-compose.prod.yml exec juice_app php artisan config:cache
-docker compose -f docker-compose.prod.yml exec juice_app php artisan route:cache
-docker compose -f docker-compose.prod.yml exec juice_app php artisan view:cache
+docker-compose -f docker-compose.prod.yml exec juice_app php artisan config:cache
+docker-compose -f docker-compose.prod.yml exec juice_app php artisan route:cache
+docker-compose -f docker-compose.prod.yml exec juice_app php artisan view:cache
 
 # Run database migrations
 print_status "Running database migrations..."
-docker compose -f docker-compose.prod.yml exec juice_app php artisan migrate --force
+docker-compose -f docker-compose.prod.yml exec juice_app php artisan migrate --force
 
 # Clear Laravel cache
 print_status "Clearing Laravel cache..."
-docker compose -f docker-compose.prod.yml exec juice_app php artisan cache:clear
+docker-compose -f docker-compose.prod.yml exec juice_app php artisan cache:clear
 
 # Check container status
 print_status "Checking container status..."
-docker compose -f docker-compose.prod.yml ps
+docker-compose -f docker-compose.prod.yml ps
 
 # Health check
 print_status "Performing health check..."
 if curl -f http://localhost:8080/health > /dev/null 2>&1; then
-    print_status "✅ Application is healthy and running!"
+    print_status "Application is healthy and running!"
 else
-    print_error "❌ Health check failed. Please check the logs."
-    docker compose -f docker-compose.prod.yml logs juice_app
+    print_error " Health check failed. Please check the logs."
+    docker-compose -f docker-compose.prod.yml logs juice_app
     exit 1
 fi
 
 echo ""
-print_status "🎉 FreshSip deployment completed successfully!"
-print_status "🌐 Application is available at: http://localhost:8080"
-print_status "📊 To view logs: docker compose -f docker-compose.prod.yml logs -f"
-print_status "🛑 To stop: docker compose -f docker-compose.prod.yml down"
+print_status "FreshSip deployment completed successfully!"
+print_status "Application is available at: http://localhost:8080"
+print_status "To view logs: docker-compose -f docker-compose.prod.yml logs -f"
+print_status "To stop: docker-compose -f docker-compose.prod.yml down"

@@ -22,7 +22,7 @@ RUN apk add --no-cache \
     make
 
 # Clear package cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN rm -rf /var/cache/apk/*
 
 # Install PHP extensions
 RUN docker-php-ext-install \

@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Install system dependencies
 RUN apk add --no-cache \
@@ -6,6 +6,7 @@ RUN apk add --no-cache \
     zip \
     unzip \
     curl \
+    curl-dev \
     libzip-dev \
     libpng-dev \
     freetype-dev \
@@ -19,13 +20,12 @@ RUN apk add --no-cache \
     g++ \
     make
 
-# Install PHP extensions (mbstring is already included, no oniguruma)
+# Install PHP extensions
 RUN docker-php-ext-configure gd \
         --with-freetype \
         --with-jpeg \
     && docker-php-ext-install \
         pdo_mysql \
-        mbstring \
         zip \
         gd \
         curl \
@@ -47,8 +47,7 @@ RUN composer install --optimize-autoloader --no-dev --no-interaction
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www/storage \
-    && chmod -R 775 /var/www/bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache
 
 # Laravel production optimization
 RUN php artisan config:cache \
@@ -60,7 +59,8 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
+# Create supervisor log directory
+RUN mkdir -p /var/log/supervisor
 # Expose port
 EXPOSE 80
 

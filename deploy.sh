@@ -58,6 +58,14 @@ docker-compose -f docker-compose.prod.yml up -d --build
 print_status "Waiting for containers to be ready..."
 sleep 30
 
+# Install PHP dependencies
+print_status "Installing PHP dependencies..."
+if [ -f ".env.production" ]; then
+    docker-compose -f docker-compose.prod.yml exec juice_app composer install --optimize-autoloader --no-dev --no-interaction
+else
+    print_warning ".env.production not found, skipping composer install"
+fi
+
 # Run Laravel optimizations
 print_status "Running Laravel optimizations..."
 docker-compose -f docker-compose.prod.yml exec juice_app php artisan config:cache

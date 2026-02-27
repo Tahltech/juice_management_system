@@ -20,9 +20,9 @@ services:
       - DB_CONNECTION=mysql
       - DB_HOST=juice_db
       - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE:-juice_management}
+      - DB_DATABASE=${DB_DATABASE:-juice_db}
       - DB_USERNAME=${DB_USERNAME:-juice_user}
-      - DB_PASSWORD=${DB_PASSWORD:-juice_password}
+      - DB_PASSWORD=${DB_PASSWORD:-juice_pass}
       - CACHE_DRIVER=redis
       - REDIS_HOST=juice_redis
       - REDIS_PORT=6379

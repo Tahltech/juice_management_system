@@ -11,6 +11,7 @@ services:
     volumes:
       - ./storage:/var/www/storage
       - ./bootstrap/cache:/var/www/bootstrap/cache
+      - ./.env.production:/var/www/.env
     networks:
       - juice_network
     environment:
@@ -45,9 +46,9 @@ services:
     container_name: juice_db_prod
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-juice_management}
+      MYSQL_DATABASE: ${DB_DATABASE:-juice_db}
       MYSQL_USER: ${DB_USERNAME:-juice_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-juice_password}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-juice_pass}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
     volumes:
       - mysql_data:/var/lib/mysql

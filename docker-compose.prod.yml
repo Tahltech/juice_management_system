@@ -25,6 +25,7 @@ services:
   juice_db:
     image: mysql:8.0
     container_name: juice_db_prod
+    hostname: juice_db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-juice_db}
@@ -41,6 +42,7 @@ services:
   juice_redis:
     image: redis:7-alpine
     container_name: juice_redis_prod
+    hostname: juice_redis
     restart: unless-stopped
     volumes:
       - redis_data:/data

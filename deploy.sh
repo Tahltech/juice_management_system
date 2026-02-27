@@ -40,7 +40,15 @@ docker-compose down
 
 # Build frontend assets
 print_status "Building frontend assets..."
-npm run build
+if command -v npm &> /dev/null; then
+    if [ ! -d "node_modules" ]; then
+        print_status "Installing npm dependencies..."
+        npm install
+    fi
+    npm run build
+else
+    print_warning "npm not found. Skipping frontend build. Please build assets locally and commit them."
+fi
 
 # Build and start production containers
 print_status "Building production containers..."
@@ -79,7 +87,7 @@ else
 fi
 
 echo ""
-print_status "FreshSip deployment completed successfully!"
+print_status "sFreshSip deployment completed successfully!"
 print_status "Application is available at: http://localhost:8080"
 print_status "To view logs: docker-compose -f docker-compose.prod.yml logs -f"
 print_status "To stop: docker-compose -f docker-compose.prod.yml down"

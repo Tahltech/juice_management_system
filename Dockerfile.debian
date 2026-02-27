@@ -1,37 +1,34 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2-fpm
 
 # Install system dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     git \
     zip \
     unzip \
     curl \
     libzip-dev \
     libpng-dev \
-    freetype-dev \
-    libjpeg-turbo-dev \
-    readline-dev \
-    libxslt-dev \
+    libonig-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libreadline-dev \
+    libxslt1-dev \
+    libcurl4-openssl-dev \
+    pkg-config \
     supervisor \
     nginx \
-    pkgconfig \
-    autoconf \
-    g++ \
-    make
+    && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-configure gd \
-        --with-freetype \
-        --with-jpeg \
-    && docker-php-ext-install \
-        pdo_mysql \
-        mbstring \
-        zip \
-        gd \
-        curl \
-        xml \
-        bcmath \
-        opcache
+RUN docker-php-ext-install \
+    pdo_mysql \
+    mbstring \
+    zip \
+    gd \
+    curl \
+    xml \
+    bcmath \
+    opcache
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -42,15 +39,15 @@ WORKDIR /var/www
 # Copy application files
 COPY . .
 
-# Install PHP dependencies (production)
+# Install PHP dependencies
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www/storage \
-    && chmod -R 775 /var/www/bootstrap/cache
+    && chmod -R 755 /var/www/storage \
+    && chmod -R 755 /var/www/bootstrap/cache
 
-# Laravel production optimization
+# Clear and cache Laravel configurations
 RUN php artisan config:cache \
     && php artisan route:cache \
     && php artisan view:cache
@@ -64,5 +61,5 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Expose port
 EXPOSE 80
 
-# Start supervisor (runs nginx + php-fpm)
+# Start supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

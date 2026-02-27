@@ -19,7 +19,7 @@ RUN apk add --no-cache \
     g++ \
     make
 
-# Install PHP extensions
+# Install PHP extensions (mbstring is already included, no oniguruma)
 RUN docker-php-ext-configure gd \
         --with-freetype \
         --with-jpeg \
@@ -64,5 +64,5 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Expose port
 EXPOSE 80
 
-# Start supervisor (runs nginx + php-fpm)
+# Start supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

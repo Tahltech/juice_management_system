@@ -7,6 +7,7 @@ export default defineConfig({
         laravel({
             input: 'resources/js/app.jsx',
             refresh: false,  // Disable for production
+            buildDirectory: 'build',
         }),
         react(),
     ],
@@ -14,5 +15,6 @@ export default defineConfig({
         outDir: 'public/build',
         manifest: true,
         assetsDir: 'assets',
+        emptyOutDir: true,
     },
 });

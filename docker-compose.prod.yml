@@ -12,6 +12,7 @@ services:
       - ./storage:/var/www/storage
       - ./bootstrap/cache:/var/www/bootstrap/cache
       - ./.env.production:/var/www/.env
+      - ./public:/var/www/public
     networks:
       - juice_network
     env_file:

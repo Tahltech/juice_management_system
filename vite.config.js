@@ -13,17 +13,9 @@ export default defineConfig({
     ],
     build: {
         outDir: 'public/build',
-        manifest: true,
         assetsDir: 'assets',
         emptyOutDir: true,
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    'vendor': ['react', 'react-dom'],
-                    'app': 'resources/js/app.jsx',
-                },
-            },
-        },
+        manifest: 'manifest.json',
     },
     server: {
         hmr: {

@@ -37,6 +37,11 @@ Route::get('/test', function () {
     return response()->json(['message' => 'Laravel is working!']);
 });
 
+// Add test route
+Route::get('/test', function () {
+    return view('test');
+})->name('test');
+
 // Admin routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');

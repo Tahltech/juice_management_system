@@ -7,7 +7,7 @@ export default defineConfig({
         laravel({
             input: 'resources/js/app.jsx',
             refresh: false,  // Disable for production
-            buildDirectory: 'build',
+            buildDirectory: 'build',  // Explicit build directory
         }),
         react(),
     ],
@@ -16,5 +16,18 @@ export default defineConfig({
         manifest: true,
         assetsDir: 'assets',
         emptyOutDir: true,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vendor': ['react', 'react-dom'],
+                    'app': 'resources/js/app.jsx',
+                },
+            },
+        },
+    },
+    server: {
+        hmr: {
+            clientPort: 5173,  // Keep for development
+        },
     },
 });

@@ -1,0 +1,79 @@
+version: "3.9"
+
+services:
+
+  # PHP-FPM for Laravel
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: laravel_php
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./application:/var/www/html
+    networks:
+      - laravel
+
+  # Nginx web server
+  nginx:
+    image: nginx:latest
+    container_name: laravel_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./application:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - laravel
+
+  # MySQL database
+  mysql:
+    image: mysql:8.0
+    container_name: laravel_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laraveluser
+      MYSQL_PASSWORD: laravelpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - laravel
+
+  # Redis cache (optional, recommended for Laravel queues & cache)
+  redis:
+    image: redis:latest
+    container_name: laravel_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - laravel
+
+  # Node.js for asset compilation (optional for React dev)
+  node:
+    image: node:20
+    container_name: laravel_node
+    working_dir: /var/www/html
+    volumes:
+      - ./application:/var/www/html
+    command: ["npm", "run", "dev"]
+    networks:
+      - laravel
+
+# Volumes for persistent storage
+volumes:
+  db_data:
+
+# Shared network
+networks:
+  laravel:
+    driver: bridge
